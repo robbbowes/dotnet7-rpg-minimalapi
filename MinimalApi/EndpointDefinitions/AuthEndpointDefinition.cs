@@ -1,8 +1,7 @@
 ﻿using Application.Users.Commands;
-using Domain.Models;
 using MediatR;
 using MinimalApi.Abstractions;
-using MinimalApi.DTOs.Users;
+using MinimalApi.Filters.Auth;
 
 namespace MinimalApi.EndpointDefinitions
 {
@@ -12,20 +11,30 @@ namespace MinimalApi.EndpointDefinitions
         {
             var auth = application.MapGroup("/api/auth");
 
-            auth.MapPost("/register", Register);
-            auth.MapPost("/login", Login);
+            auth.MapPost("/register", Register)
+                .AddEndpointFilter<RegisterValidationFilter>();
+            auth.MapPost("/login", Login)
+                .AddEndpointFilter<LoginValidationFilter>();
         }
 
         private async Task<IResult> Register(IMediator mediator, RegisterUser newUser)
         {
-            var createdUser = await mediator.Send(newUser);
-            return Results.Ok(createdUser);
+            var response = await mediator.Send(newUser);
+            if (!response.Success)
+            {
+                return Results.BadRequest(response);
+            }
+            return Results.Ok(response);
         }
 
         private async Task<IResult> Login(IMediator mediator, LoginUser loginUser)
         {
-            var loggedInUser = await mediator.Send(loginUser);
-            return Results.Ok(loggedInUser);
+            var response = await mediator.Send(loginUser);
+            if (!response.Success)
+            {
+                return Results.BadRequest(response);
+            }
+            return Results.Ok(response);
         }
     }
 }

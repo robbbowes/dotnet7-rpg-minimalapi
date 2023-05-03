@@ -22,7 +22,8 @@ namespace DataAccess.Repositories
         public async Task<ApiResponse<string>> Login(string username, string password)
         {
             var response = new ApiResponse<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username.ToLower().Equals(username.ToLower()));
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username.ToLower().Equals(username.ToLower()));
 
             if ((user is null) || (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)))
             {
