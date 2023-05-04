@@ -37,11 +37,11 @@ namespace DataAccess.Repositories
             return response;
         }
 
-        public async Task<ApiResponse<int>> Register(User user, string password)
+        public async Task<ApiResponse<int>> Register(string username, string password)
         {
             var response = new ApiResponse<int>();
 
-            if (await UserExists(user.Username))
+            if (await UserExists(username))
             {
                 response.Success = false;
                 response.Message = "User already exists";
@@ -50,8 +50,12 @@ namespace DataAccess.Repositories
 
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            var user = new User()
+            {
+                Username = username,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
+            };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();

@@ -16,12 +16,7 @@ namespace Application.Users.CommandHandlers
 
         public async Task<ApiResponse<int>> Handle(RegisterUser request, CancellationToken cancellationToken)
         {
-            var newUser = new User
-            {
-                Username = request.Username
-            };
-
-            return await _authRepo.Register(newUser, request.Password);
+            return await _authRepo.Register(request.Username, request.Password);
         }
     }
 }
